@@ -23,12 +23,12 @@ app.use(function(req, res, next) {
 });
 
 mongoose.Promise = global.Promise;
-io.on("Connection",socket =>{
-    socket.emit("your id", socket.id);
-    socket.on("send message",body =>{
-        io.emit("message",body)
-    })
-})
+// io.on("Connection",socket =>{
+//     socket.emit("your id", socket.id);
+//     socket.on("send message",body =>{
+//         io.emit("message",body)
+//     })
+// })
 
 app.use("/users",userRoutes);
 app.use((req, res, next) => {
