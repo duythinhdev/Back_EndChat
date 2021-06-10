@@ -21,22 +21,22 @@ mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true})
 //     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 //     next();
 // });
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
-    res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    next();
-});
+// app.use((req, res, next) => {
+//     res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+//     res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+//     res.header(
+//         "Access-Control-Allow-Headers",
+//         "Origin, X-Requested-With, Content-Type, Accept"
+//     );
+//     next();
+// });
 mongoose.Promise = global.Promise;
 
-// app.use(cors({
-//     origin: "http://localhost:1999",
-//     credentials:true,
-//     optionsSuccessStatus: 200
-// }))
+app.use(cors({
+    origin: "http://localhost:1999",
+    credentials:true,
+    optionsSuccessStatus: 200
+}))
 
 app.use("/users",userRoutes);
 app.use((req, res, next) => {
