@@ -3,13 +3,13 @@ const app = express();
 const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
 const morgan = require('morgan');
+const cors = require('cors')
 
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 const userRoutes = require('./api/users/users')
-const io = require("socket.io");
 var mongoDB =  'mongodb+srv://duythinh:716284@cluster0.dovxc.mongodb.net/messengerapp?retryWrites=true&w=majority';
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true})
     .then(() => console.log("MongoDb connected"))
@@ -21,14 +21,23 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
-
+// app.use((req, res, next) => {
+//     res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+//     res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+//     res.header(
+//         "Access-Control-Allow-Headers",
+//         "Origin, X-Requested-With, Content-Type, Accept"
+//     );
+//     next();
+// });
 mongoose.Promise = global.Promise;
-// io.on("Connection",socket =>{
-//     socket.emit("your id", socket.id);
-//     socket.on("send message",body =>{
-//         io.emit("message",body)
-//     })
-// })
+
+app.use(cors());
+// app.use(cors({
+//     origin: "http://localhost:1999",
+//     credentials:true,
+//     optionsSuccessStatus: 200
+// }))
 
 app.use("/users",userRoutes);
 app.use((req, res, next) => {
