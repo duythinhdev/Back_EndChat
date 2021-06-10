@@ -2,8 +2,11 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 
+ const client = new OAuth2Client("585482924930-c758fq94e6ag9dlni35dpkedbh6dqesp.apps.googleusercontent.com");
 exports.signup_user = (req, res, next) => {
+    console.log("req",req.body.email,req.body.name)
     User.find({email: req.body.email}).exec().then(user => {
         if (user.length >= 1) {
             return res.status(409).json({
@@ -18,7 +21,6 @@ exports.signup_user = (req, res, next) => {
                 } else {
                     const user = new User({
                         _id: new mongoose.Types.ObjectId(),
-                        typesignup: req.body.type,
                         name: req.body.name,
                         email: req.body.email,
                         password: hash
@@ -26,7 +28,8 @@ exports.signup_user = (req, res, next) => {
                     user.save().then(result => {
                             console.log(result)
                             res.status(201).json({
-                                message: "User created"
+                                message: "User created",
+                                result: result
                             })
                         }
                     ).catch(err => {
@@ -62,7 +65,7 @@ exports.login_user = (req, res, next) => {
                             email: user[0].email,
                             userId: user[0]._id
                         }, "secret", {
-                            expiresIn: "1h"
+                            expiresIn: "7d"
                         }
                     )
                     return res.status(401).json({
@@ -83,8 +86,8 @@ exports.login_user = (req, res, next) => {
             }
         );
 }
+
 exports.delete_user = (req, res, next) => {
-    console.log("123123123delete")
     User.remove({_id: req.params.userId})
         .exec()
         .then(result => {
@@ -100,4 +103,13 @@ exports.delete_user = (req, res, next) => {
                 })
             }
         );
+}
+
+exports.googleLogin_user = (req, res, next) =>{
+    const { tokenId } = req.body;
+    client.verifyIdToken({tokenId,audience: "585482924930-c758fq94e6ag9dlni35dpkedbh6dqesp.apps.googleusercontent.com"}).then(response=>{
+        const { email_verified,name,email } = response.payload;
+        console.log("response",response.payload)
+    })
+
 }
