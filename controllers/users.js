@@ -109,6 +109,43 @@ exports.googleLogin_user = (req, res, next) =>{
     const { tokenId } = req.body;
     client.verifyIdToken({tokenId,audience: "585482924930-c758fq94e6ag9dlni35dpkedbh6dqesp.apps.googleusercontent.com"}).then(response=>{
         const { email_verified,name,email } = response.payload;
+        if(email_verified)
+        {
+            User.findOne({email}).exec(err,user => {
+                if(err)
+                {
+                    return res.status(400).json({error:"Something went wrong ....."})
+                }
+                else{
+                    if(user)
+                    {
+                        const token  = jwt.sign({_id: user.id},"secret",{ expiresIn: '7d'});
+                        const { _id,name,email } = user;
+                        res.json({
+                            token,
+                            user: { _id, name, email }
+                        })
+                    }else {
+                        let password = email+"secret";
+                        let newUser = new User({name,email,password})
+                        newUser.save((err,data)=>{
+                            if(err)
+                            {
+                                return res.status(400).json({
+                                    error: "Something went wrong"
+                                })
+                            }
+                            const token  = jwt.sign({_id: data.id},"secret",{ expiresIn: '7d'});
+                            const { _id, name, email } = user;
+                            res.json({
+                                token,
+                                user: { _id, name, email }
+                            })
+                        })
+                    }
+                }
+            })
+        }
         console.log("response",response.payload)
     })
 
