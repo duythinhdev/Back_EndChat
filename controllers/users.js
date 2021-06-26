@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt-nodejs');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 
- const client = new OAuth2Client("585482924930-c758fq94e6ag9dlni35dpkedbh6dqesp.apps.googleusercontent.com");
+ // const client = new OAuth2Client("585482924930-c758fq94e6ag9dlni35dpkedbh6dqesp.apps.googleusercontent.com");
 exports.signup_user = (req, res, next) => {
     console.log("req",req.body.email,req.body.name)
     User.find({email: req.body.email}).exec().then(user => {
@@ -21,6 +21,7 @@ exports.signup_user = (req, res, next) => {
                 } else {
                     const user = new User({
                         _id: new mongoose.Types.ObjectId(),
+                        name: req.body.name,
                         email: req.body.email,
                         password: hash
                     });
@@ -106,6 +107,7 @@ exports.delete_user = (req, res, next) => {
 }
 
 exports.googleLogin_user = (req, res, next) =>{
+    console.log("12312312",req)
     const { tokenId } = req.body;
     client.verifyIdToken({tokenId,audience: "585482924930-c758fq94e6ag9dlni35dpkedbh6dqesp.apps.googleusercontent.com"}).then(response=>{
         const { email_verified,name,email } = response.payload;
@@ -149,4 +151,8 @@ exports.googleLogin_user = (req, res, next) =>{
         console.log("response",response.payload)
     })
 
+}
+
+exports.facebookLogin_user = (req, res, next) =>{
+    const { userID,accessToken } = req.body;
 }
