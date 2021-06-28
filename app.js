@@ -11,9 +11,7 @@ const io = require("socket.io")(8900,{
         origin: "http://localhost:1999"
     }
 })
-app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
+
 
 var mongoDB =  'mongodb+srv://duythinh:716284@cluster0.dovxc.mongodb.net/messengerapp?retryWrites=true&w=majority';
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true})
@@ -29,6 +27,10 @@ app.use((req, res, next) => {
     );
     next();
 });
+app.use(morgan('dev'));
+//tell express to use bodyParser for JSON and URL encoded form bodies
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 app.use("/users",userRoutes);
 app.use("/tablechat",tableChatRoutes)
 app.use("/message",messageRoutes)
