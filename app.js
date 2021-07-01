@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const tableChatRoutes = require('./api/tablechat/convert')
 const userRoutes = require('./api/users/users')
 const messageRoutes = require('./api/message/message')
+require('dotenv').config();
 const io = require("socket.io")(8900,{
     cors: {
         origin: "http://localhost:1999"
@@ -13,8 +14,7 @@ const io = require("socket.io")(8900,{
 })
 
 
-var mongoDB =  'mongodb+srv://duythinh:716284@cluster0.dovxc.mongodb.net/messengerapp?retryWrites=true&w=majority';
-mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true})
+mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true})
     .then(() => console.log("MongoDb connected"))
     .catch(err => console.log(err));
 

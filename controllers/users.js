@@ -3,22 +3,23 @@ const User = require("../models/user");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Joi = require('joi');
+require('dotenv').config();
 // const { OAuth2Client } = require('google-auth-library');
 // const client = new OAuth2Client("585482924930-c758fq94e6ag9dlni35dpkedbh6dqesp.apps.googleusercontent.com");
 exports.signup_user = (req, res, next) => {
-    const schema = Joi.object().keys({
-        name: Joi.string().required() ,
-        email:Joi.string().required()  ,
-        password:  Joi.string().min(6).required()
-    })
-    const validate  = schema.validate(req.body)
-    console.log(validate.err)
-    if(validate.err)
-    {
-        return res.status(400).json({
-            message: validate.err
-        })
-    }
+    // const schema = Joi.object().keys({
+    //     name: Joi.string().required() ,
+    //     email:Joi.string().required()  ,
+    //     password:  Joi.string().min(6).required()
+    // })
+    // const validate  = schema.validate(req.body)
+    // console.log(validate.err)
+    // if(validate.err)
+    // {
+    //     return res.status(400).json({
+    //         message: validate.err
+    //     })
+    // }
     User.find({email: req.body.email}).exec().then(user => {
         if (user.length >= 1) {
             console.log("user",user);
@@ -65,7 +66,7 @@ exports.login_user = (req, res, next) => {
             console.log("user",user);
             if (user.length < 1) {
                 return res.status(404).json({
-                    message: 'Auth failed'
+                    message: 'Auth failed1'
                 })
             }
             bcrypt.compare(req.body.password, user[0].password, (err, result) => {
@@ -78,17 +79,23 @@ exports.login_user = (req, res, next) => {
                     const token = jwt.sign({
                             email: user[0].email,
                             userId: user[0]._id
-                        }, "secret", {
+                        }, process.env.SECRETKEY, {
                             expiresIn: "7d"
                         }
                     )
+                    const expireTokenDuration = 60 * 60 * 24  * 30;
+                    console.log("expireTokenDuration",expireTokenDuration);
+                    const now =  new Date();
+                    const expiredAt = new Date(now.getTime() + (expireTokenDuration * 1000));
                     return res.status(200).json({
                         message: 'Auth success',
-                        token: token
+                        userId: user[0]._id,
+                        token: token,
+                        expiredAt: expiredAt
                     })
                 }
                 res.status(401).json({
-                    message: 'Auth failed'
+                    message: 'Auth failed3'
                 })
             })
         })
